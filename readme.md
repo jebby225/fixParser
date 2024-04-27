@@ -124,7 +124,7 @@ Users could import the **FixParser.jar** file and utilize the FIX parser
  3. Call either of the below method to retrieve a `FixComponent` object, where it contains all the tags available in the input byte array. Required tags are set in the pre-defined properties if `parseByMessageType` is called
     * `FixParserService.parseGeneric(byte[]);` 
     * `FixParserService.parseByMessageType(input_F.getBytes());`
- 4. A sample program `FixParserCaller` is provided separately for demo and benchmark showing purposes. 
+ 4. A sample program [FixParserCaller](https://github.com/jebby225/fixParserCaller) is provided separately for demo and benchmark showing purposes. 
 
 
 ### Unit Tests
