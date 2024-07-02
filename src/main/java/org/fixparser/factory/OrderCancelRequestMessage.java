@@ -6,6 +6,7 @@ import org.fixparser.component.TagValuePair;
 import org.fixparser.util.ByteArrayToolBox;
 import org.fixparser.constant.ExceptionMessages;
 import org.fixparser.constant.FixConstants;
+import org.fixparser.util.ByteArrayWrapper;
 
 import java.time.LocalDateTime;
 
@@ -60,7 +61,8 @@ public class OrderCancelRequestMessage extends FixMessage {
                     System.arraycopy(fixMsgArr, eIdx + 1 , tagValue.getValue(), 0, i  - eIdx -1);
 
                     //new TagValuePair<>(sIdx, eIdx, eIdx+2, i - 1);
-                    tagValuePairs[idx] = tagValue;
+                    //tagValuePairs[idx] = tagValue;
+                    tagValueMap.put(new ByteArrayWrapper(tagValue.getTag()), tagValue.getValue());
                     idx++;
                 }
                 sIdx = i + 1;

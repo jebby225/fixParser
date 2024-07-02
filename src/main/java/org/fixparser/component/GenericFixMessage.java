@@ -4,8 +4,12 @@ import org.fixparser.component.FixComponent;
 import org.fixparser.constant.ExceptionMessages;
 import org.fixparser.constant.FixConstants;
 import org.fixparser.util.ByteArrayToolBox;
+import org.fixparser.util.ByteArrayWrapper;
 import org.fixparser.util.TagValueMap;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.fixparser.util.ByteArrayToolBox.bytesToInt;
 
 public class GenericFixMessage implements FixComponent {
@@ -13,7 +17,8 @@ public class GenericFixMessage implements FixComponent {
     private int bodyLength;
     private byte[] msgType;
     private int checkSum;
-    private TagValueMap tagValueMap;
+    // private TagValueMap tagValueMap;
+    private HashMap<ByteArrayWrapper, byte[]> tagValueMap;
     private int bodyIdx;
     private int bodyEidx;
     
@@ -25,8 +30,9 @@ public class GenericFixMessage implements FixComponent {
         if(!parseTrailer(fixMsgArr)){
             throw new NullPointerException(ExceptionMessages.INVALID_TRAILER);
         }
-        int cnt = ByteArrayToolBox.countOccurrences(fixMsgArr, (char) FixConstants.SOH, bodyIdx) ;
-        this.tagValueMap = new TagValueMap(cnt);
+        // int cnt = ByteArrayToolBox.countOccurrences(fixMsgArr, (char) FixConstants.SOH, bodyIdx) ;
+        // this.tagValueMap = new TagValueMap(cnt);
+        this.tagValueMap = new HashMap<>();
         return parseBody(fixMsgArr);
     }
 
@@ -45,9 +51,15 @@ public class GenericFixMessage implements FixComponent {
                 } else if(i  - eIdx -1 <= 0) {  // if value is empty
                     throw new IllegalArgumentException(ExceptionMessages.EMPTY_TAG_VALUE_PAIR);
                 }
-                valueArr = new byte[i  - eIdx - 1];
-                System.arraycopy(fixMsgArr, eIdx + 1 , valueArr, 0, i  - eIdx -1);
-                tagValueMap.put(ByteArrayToolBox.bytesToInt(fixMsgArr, sIdx, eIdx), valueArr);
+                //valueArr = new byte[i  - eIdx - 1];
+                //System.arraycopy(fixMsgArr, eIdx + 1 , valueArr, 0, i  - eIdx -1);
+                //tagValueMap.put(ByteArrayToolBox.bytesToInt(fixMsgArr, sIdx, eIdx), valueArr);
+
+                TagValuePair<byte[], byte[]> tagValue = new TagValuePair<>(new byte[eIdx - sIdx], new byte[i  - eIdx - 1]);
+                System.arraycopy(fixMsgArr, sIdx, tagValue.getTag(), 0, eIdx - sIdx);
+                System.arraycopy(fixMsgArr, eIdx + 1 , tagValue.getValue(), 0, i  - eIdx -1);
+                tagValueMap.put(new ByteArrayWrapper(tagValue.getTag()), tagValue.getValue());
+
                 sIdx = i + 1;
             }
         }
@@ -156,8 +168,8 @@ public class GenericFixMessage implements FixComponent {
     }
 
     @Override
-    public byte[] getValueByTag(int tag) {
-        return tagValueMap.get(tag);
+    public byte[] getValueByTag(byte[] tag) {
+        return tagValueMap.get(new ByteArrayWrapper(tag));
     }
     @Override
     public String toString() {
@@ -167,13 +179,19 @@ public class GenericFixMessage implements FixComponent {
           .append("msgType=").append(new String(msgType)).append("\n")
           .append("checkSum=").append(checkSum).append("\n");
         byte[] val;
-        for(int i = 0; i < tagValueMap.getSize(); i++) {
+
+        for (Map.Entry<ByteArrayWrapper, byte[]> entry : tagValueMap.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(new String(entry.getValue())).append("\n");
+        }
+
+        /*
+        for(int i = 0; i < tagValueMap.size(); i++) {
             val =tagValueMap.getValueByIndex(i);
             if( val == null) {
                 return sb.toString();
             }
             sb.append(tagValueMap.getTagByIndex(i)).append("=").append(new String(val)).append("\n");
-        }
+        } */
         return sb.toString();
     }
 

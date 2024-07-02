@@ -7,14 +7,18 @@ import org.fixparser.component.TagValuePair;
 import org.fixparser.constant.ExceptionMessages;
 import org.fixparser.constant.FixConstants;
 import org.fixparser.util.ByteArrayToolBox;
+import org.fixparser.util.ByteArrayWrapper;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class FixMessage implements FixComponent {
     protected final FixHeader header;
     protected final FixTrailer trailer;
     protected final int requiredFieldCount;
-    protected TagValuePair<byte[], byte[]>[] tagValuePairs;
+    //protected TagValuePair<byte[], byte[]>[] tagValuePairs;
+    protected HashMap<ByteArrayWrapper, byte[]> tagValueMap;
 
     protected FixMessage(FixHeader header, FixTrailer trailer, int requiredFieldCount) {
         this.header = header;
@@ -23,24 +27,34 @@ public abstract class FixMessage implements FixComponent {
     }
 
     protected final void initializeTagValuePairsArr(byte[] inputArr) {
-        int cnt = ByteArrayToolBox.countOccurrences(inputArr, (char) FixConstants.SOH, header.getBodyIdx()) ;
-        tagValuePairs = new TagValuePair[cnt];
+        tagValueMap = new HashMap<>();
+        //int cnt = ByteArrayToolBox.countOccurrences(inputArr, (char) FixConstants.SOH, header.getBodyIdx()) ;
+        //tagValuePairs = new TagValuePair[cnt];
     }
 
     protected final String displayTagValuePairsArr() {
         StringBuilder sb = new StringBuilder();
 
-        for(TagValuePair<byte[], byte[]> tvp : this.tagValuePairs) {
+        for (Map.Entry<ByteArrayWrapper, byte[]> entry : tagValueMap.entrySet()) {
+            if(entry == null) {
+                return sb.toString();
+            }
+            sb.append(entry.getKey()).append("=").append(new String(entry.getValue())).append("\n");
+        }
+
+       /* for(TagValuePair<byte[], byte[]> tvp : this.tagValuePairs) {
              if(tvp == null) {
                 return sb.toString();
             }
             sb.append(new String(tvp.getTag())).append("=").append(new String(tvp.getValue())).append("\n");
-        }
+        } */
         return sb.toString();
     }
 
     @Override
-    public byte[] getValueByTag(int tag) {
+    public byte[] getValueByTag(byte[] tag) {
+        return tagValueMap.get(new ByteArrayWrapper(tag));
+        /*
         outterLoop:
         for(TagValuePair<byte[], byte[]> tvp : this.tagValuePairs) {
             if (tvp == null) {
@@ -66,6 +80,6 @@ public abstract class FixMessage implements FixComponent {
             }
         }
         System.out.println(String.format(ExceptionMessages.TAG_NOT_FOUND, tag));
-        return null;
+        return null; */
     }
 }

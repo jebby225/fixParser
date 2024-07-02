@@ -30,8 +30,8 @@ public class FixParserApplication {
 
             // ***** Example to get value by tag and to display the FIX object
             byte[] b;
-            for(int tag : Arrays.asList(49, 56, 109, 9, 60)) {
-                b = msg.getValueByTag(tag);
+            for(String tag : Arrays.asList("49", "56", "109", "9", "60")) {
+                b = msg.getValueByTag(tag.getBytes());
                 if(b != null)
                     System.out.println(String.format("Tag %s: ", tag) + new String(b));
             }

@@ -83,7 +83,18 @@ public class FixHeader implements FixComponent {
     }
 
     @Override
-    public byte[] getValueByTag(int tag) {
+    public byte[] getValueByTag(byte[] tag) {
+        if(Arrays.equals(tag, "8".getBytes())) {
+            return fixVersion;
+        } else if(Arrays.equals(tag, "9".getBytes())) {
+            return bodyLenArr;
+        } else if(Arrays.equals(tag, "35".getBytes())) {
+            return msgType;
+        } else {
+            return null;
+        }
+
+        /*
         switch (tag) {
             case 8:
                 return fixVersion;
@@ -93,7 +104,7 @@ public class FixHeader implements FixComponent {
                 return msgType;
             default:
                 return null;
-        }
+        } */
     }
 
     @Override

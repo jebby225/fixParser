@@ -4,6 +4,8 @@ import org.fixparser.constant.ExceptionMessages;
 import org.fixparser.constant.FixConstants;
 import org.fixparser.util.ByteArrayToolBox;
 
+import java.util.Arrays;
+
 public class FixTrailer implements FixComponent {
 
     private int checkSum;
@@ -52,13 +54,17 @@ public class FixTrailer implements FixComponent {
     }
 
     @Override
-    public byte[] getValueByTag(int tag) {
-        switch (tag) {
+    public byte[] getValueByTag(byte[] tag) {
+        if(Arrays.equals(tag, "10".getBytes())) {
+            return checkSumArr;
+        }
+        return null;
+       /* switch (tag) {
             case 10:
                 return checkSumArr;
             default:
                 return null;
-        }
+        } */
     }
 
     @Override

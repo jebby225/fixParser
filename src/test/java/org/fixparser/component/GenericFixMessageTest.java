@@ -116,8 +116,8 @@ public class GenericFixMessageTest {
             assertEquals( 127, gMessage.getCheckSum());
             assertEquals(251, gMessage.getBodyLength());
             assertEquals("D", new String(gMessage.getMsgType()));
-            assertEquals("AFUNDMGR", new String(gMessage.getValueByTag(49)));
-            assertEquals("2003061501:14:49", new String(gMessage.getValueByTag(52)));
+            assertEquals("AFUNDMGR", new String(gMessage.getValueByTag("49".getBytes())));
+            assertEquals("2003061501:14:49", new String(gMessage.getValueByTag("52".getBytes())));
         } else {
             fail("Message is not of type GenericFixMessage");
         }
@@ -132,7 +132,7 @@ public class GenericFixMessageTest {
         // Verify header fields
         if(message instanceof GenericFixMessage) {
             GenericFixMessage gMessage = (GenericFixMessage) message;
-            assertEquals(null, gMessage.getValueByTag(900));
+            assertEquals(null, gMessage.getValueByTag("900".getBytes()));
         } else {
             fail("Message is not of type GenericFixMessage");
         }
